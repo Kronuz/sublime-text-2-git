@@ -1,4 +1,6 @@
-import sublime, sublime_plugin
+import sublime
+import sublime_plugin
+
 import os
 import re
 from .git import git_root, GitTextCommand, GitWindowCommand, do_when, goto_xy
@@ -19,7 +21,6 @@ class GitDiff (object):
 
     def show_done(self, result):
         # GitLog Copy-Past
-        import os
         self.results = []
         self.files = {}
         relative = None
@@ -32,7 +33,7 @@ class GitDiff (object):
                         relative = os.sep.join(['..'] * (len(os.path.normpath(_result[0]).split(os.sep)) - 1))
                         if relative:
                             relative += os.sep
-                    ref = result[1].split(' ', 1)[0]
+                    ref = result[0].split(' ', 1)[0]
                     self.files[ref] = relative + _result[0]
                 else:
                     result = _result

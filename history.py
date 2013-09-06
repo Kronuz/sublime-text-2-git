@@ -1,4 +1,5 @@
 import functools
+import os
 import re
 from operator import methodcaller
 
@@ -12,7 +13,7 @@ class GitBlameCommand(GitTextCommand):
         # -w: ignore whitespace changes
         # -M: retain blame when moving lines
         # -C: retain blame when copying lines between files
-        command = ['git', 'blame', '-w', '-M', '-C']
+        command = ['git', 'blame', '-w', '-M', '-C', '--date=short', '--abbrev=6']
 
         lines = self.get_lines()
         if lines:
@@ -63,7 +64,6 @@ class GitLog(object):
             self.log_done)
 
     def log_done(self, result):
-        import os
         self.results = []
         self.files = {}
         relative = None
@@ -76,7 +76,7 @@ class GitLog(object):
                         relative = os.sep.join(['..'] * (len(os.path.normpath(_result[0]).split(os.sep)) - 1))
                         if relative:
                             relative += os.sep
-                    ref = result[1].split(' ', 1)[0]
+                    ref = result[0].split(' ', 1)[0]
                     self.files[ref] = relative + _result[0]
                 else:
                     result = _result
@@ -128,7 +128,6 @@ class GitShow(object):
 
     def show_done(self, result):
         # GitLog Copy-Past
-        import os
         self.results = []
         self.files = {}
         relative = None
@@ -141,7 +140,7 @@ class GitShow(object):
                         relative = os.sep.join(['..'] * (len(os.path.normpath(_result[0]).split(os.sep)) - 1))
                         if relative:
                             relative += os.sep
-                    ref = result[1].split(' ', 1)[0]
+                    ref = result[0].split(' ', 1)[0]
                     self.files[ref] = relative + _result[0]
                 else:
                     result = _result
@@ -156,7 +155,7 @@ class GitShow(object):
             return
         item = self.results[picked]
         # the commit hash is the first thing on the second line
-        ref = item[1].split(' ', 1)[0]
+        ref = item[0].split(' ', 1)[0]
         self.run_command(
             ['git', 'show', '%s:%s' % (ref, self.get_relative_file_name())],
             self.details_done,
