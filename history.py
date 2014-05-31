@@ -1,7 +1,6 @@
 import functools
 import os
 import re
-from operator import methodcaller
 
 import sublime
 from .git import GitTextCommand, GitWindowCommand, plugin_file
@@ -17,7 +16,8 @@ class GitBlameCommand(GitTextCommand):
 
         lines = self.get_lines()
         if lines:
-            command.extend(('-L', str(lines[0]) + ',' + str(lines[1])))
+            for begin_line, end_line in lines:
+                command.extend(('-L', str(begin_line) + ',' + str(end_line)))
             callback = self.blame_done
         else:
             callback = functools.partial(self.blame_done,
@@ -27,17 +27,20 @@ class GitBlameCommand(GitTextCommand):
         self.run_command(command, callback)
 
     def get_lines(self):
-        selection = self.view.sel()[0]  # todo: multi-select support?
-        if selection.empty():
-            return False
-        # just the lines we have a selection on
-        begin_line, begin_column = self.view.rowcol(selection.begin())
-        end_line, end_column = self.view.rowcol(selection.end())
-        # blame will fail if last line is empty and is included in the selection
-        if end_line > begin_line and end_column == 0:
-            end_line -= 1
-        # add one to each, to line up sublime's index with git's
-        return begin_line + 1, end_line + 1
+        lines = []
+        selections = self.view.sel()
+        for selection in selections:
+            if selection.empty():
+                continue
+            # just the lines we have a selection on
+            begin_line, begin_column = self.view.rowcol(selection.begin())
+            end_line, end_column = self.view.rowcol(selection.end())
+            # blame will fail if last line is empty and is included in the selection
+            if end_line > begin_line and end_column == 0:
+                end_line -= 1
+            # add one to each, to line up sublime's index with git's
+            lines.append((begin_line + 1, end_line + 1))
+        return lines
 
     def blame_done(self, result, position=None):
         self.scratch(result, title="Git Blame", position=position,
