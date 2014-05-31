@@ -264,7 +264,7 @@ class GitCommand(object):
         }
         output_file.run_command('git_scratch_output', args)
 
-    def scratch(self, output, title=False, position=None, rowcol=None, read_only=False, **kwargs):
+    def scratch(self, output, title=False, position=None, rowcol=None, read_only=True, **kwargs):
         scratch_file = self.get_window().new_file()
         if title:
             scratch_file.set_name(title)

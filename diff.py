@@ -65,7 +65,7 @@ class GitDiff (object):
         if s.get('diff_panel'):
             view = self.panel(result, syntax=syntax)
         else:
-            view = self.scratch(result, title="Git Diff", syntax=syntax)
+            view = self.scratch(result, title="Git Diff", syntax=syntax, read_only=False)
 
         # lines_inserted = view.find_all(r'^\+(?!\+{2} )')
         # lines_deleted = view.find_all(r'^-(?!-{2} )')
@@ -94,7 +94,7 @@ class GitDiffCommit (object):
             self.panel(result)
         else:
             syntax = s.get("diff_syntax", "Packages/Diff/Diff.tmLanguage")
-            self.scratch(result, title="Git Diff", syntax=syntax)
+            self.scratch(result, title="Git Diff", syntax=syntax, read_only=False)
 
 
 class GitDiffCommand(GitDiff, GitTextCommand):

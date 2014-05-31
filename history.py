@@ -47,7 +47,7 @@ class GitBlameCommand(GitTextCommand):
         result = re.sub(r'^(.......) .* \((.*?)\s+\d+\)', r'\1 (\2)', result, 0, re.MULTILINE)
         result = re.sub(r'\s+$', r'', result, 0, re.MULTILINE)
         rowcol = rowcol and (rowcol[0], rowcol[1] + result.index(')') + 2)
-        self.scratch(result, title="Git Blame", position=position, rowcol=rowcol, read_only=True,
+        self.scratch(result, title="Git Blame", position=position, rowcol=rowcol,
                 syntax=plugin_file("syntax/Git Blame.tmLanguage"))
 
 

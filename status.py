@@ -58,7 +58,7 @@ class GitStatusCommand(GitWindowCommand):
         if s.get('diff_panel'):
             self.panel(result)
         else:
-            self.scratch(result, title="Git Diff")
+            self.scratch(result, title="Git Diff", read_only=False)
 
 
 class GitOpenModifiedFilesCommand(GitStatusCommand):
