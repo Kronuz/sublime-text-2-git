@@ -264,15 +264,21 @@ class GitCommand(object):
         }
         output_file.run_command('git_scratch_output', args)
 
-    def scratch(self, output, title=False, position=None, **kwargs):
+    def scratch(self, output, title=False, position=None, rowcol=None, read_only=False, **kwargs):
         scratch_file = self.get_window().new_file()
         if title:
             scratch_file.set_name(title)
         scratch_file.set_scratch(True)
+        scratch_file.settings().set('word_wrap', False)
         self._output_to_view(scratch_file, output, **kwargs)
-        scratch_file.set_read_only(True)
-        if position:
-            sublime.set_timeout(lambda: scratch_file.set_viewport_position(position), 0)
+        if position is not None:
+            sublime.set_timeout(lambda: scratch_file.set_viewport_position(position, False), 0)
+        if rowcol is not None:
+            pt = scratch_file.text_point(*rowcol)
+            scratch_file.sel().clear()
+            scratch_file.sel().add(sublime.Region(pt))
+        if read_only:
+            scratch_file.set_read_only(True)
         return scratch_file
 
     def panel(self, output, **kwargs):

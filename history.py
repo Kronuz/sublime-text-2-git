@@ -21,7 +21,8 @@ class GitBlameCommand(GitTextCommand):
             callback = self.blame_done
         else:
             callback = functools.partial(self.blame_done,
-                    position=self.view.viewport_position())
+                    position=self.view.viewport_position(),
+                    rowcol=self.view.rowcol(self.view.sel()[0].begin()))
 
         command.append(self.get_file_name())
         self.run_command(command, callback)
@@ -42,8 +43,11 @@ class GitBlameCommand(GitTextCommand):
             lines.append((begin_line + 1, end_line + 1))
         return lines
 
-    def blame_done(self, result, position=None):
-        self.scratch(result, title="Git Blame", position=position,
+    def blame_done(self, result, position=None, rowcol=None):
+        result = re.sub(r'^(.......) .* \((.*?)\s+\d+\)', r'\1 (\2)', result, 0, re.MULTILINE)
+        result = re.sub(r'\s+$', r'', result, 0, re.MULTILINE)
+        rowcol = rowcol and (rowcol[0], rowcol[1] + result.index(')') + 2)
+        self.scratch(result, title="Git Blame", position=position, rowcol=rowcol, read_only=True,
                 syntax=plugin_file("syntax/Git Blame.tmLanguage"))
 
 
